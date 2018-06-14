@@ -100,8 +100,9 @@ class Sprite(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    size = width, height = 500, 200
+    size = width, height = 480,320
     screen = pygame.display.set_mode(size)
+    pygame.display.toggle_fullscreen()
     clock = pygame.time.Clock()
 
     fg = load_image('sprite/world/fg.png')
@@ -118,6 +119,7 @@ def main():
             sys.exit(0)
 
         pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_ESCAPE]: sys.exit(0)
         if pressed[pygame.K_RIGHT]: ant.right()
         elif pressed[pygame.K_LEFT]: ant.left()
         elif pressed[pygame.K_DOWN]: ant.down()
