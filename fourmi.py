@@ -5,6 +5,7 @@
 import pygame
 import sys
 import numpy as np
+import random
 
 def load_image(name):
     image = pygame.image.load(name)
@@ -15,7 +16,7 @@ class Ant():
 
     # Constants
     WALKING, BOUNCING, DOWN, UP = 0, 1, 2, 3
-    LEFT, RIGHT = True, False
+    LEFT, RIGHT, STAND = 0, 1, 2
 
     def __init__(self, pos=(0, 0)):
         """Init the Ant with a position"""
@@ -32,23 +33,36 @@ class Ant():
         self.pos = pos
         self.width =  self.sprites[0].rect.width
         self.height = self.sprites[0].rect.height
+        self.mode_auto = True
+        self.walking = False
         print(self.height)
+
+    def switch_mode_auto(self):
+        self.mode_auto = not self.mode_auto
 
     def up(self):
         self.state = Ant.UP
+        self.mode_auto = False
 
     def down(self):
         self.state = Ant.DOWN
+        self.mode_auto = False
 
     def left(self):
         self.move(Ant.LEFT)
+        self.mode_auto = False
 
     def right(self):
         self.move(Ant.RIGHT)
+        self.mode_auto = False
 
     def update(self, world_width):
-        # Position
 
+        # auto_move
+        if self.mode_auto:
+            self.auto_move()
+
+        # Position
         if self.pos[0] < 0 - self.width:
             self.pos[0] = world_width
         elif self.pos[0] > world_width:
@@ -56,7 +70,7 @@ class Ant():
 
         # Animation
         self.current_sprite = self.sprites[self.state]
-        self.current_sprite.flip = self.dir
+        self.current_sprite.flip = self.dir == Ant.LEFT
         self.current_sprite.update()
 
         # Reset
@@ -66,10 +80,25 @@ class Ant():
         pos = np.add(self.pos, pos)
         self.current_sprite.draw(surface, pos)
 
+    def auto_move(self):
+        if self.walking:
+            self.move(self.dir)
+        if random.random() < .01:
+            self.walking = not self.walking
+        elif random.random() < .01:
+            self.dir = random.choice((Ant.LEFT, Ant.RIGHT))
+            self.walking = True
+
+
     def move(self, dir):
         self.dir = dir
-        self.pos = np.add(self.pos, (self.speed if not dir else -self.speed, 0))
+        if self.dir == Ant.RIGHT:
+            mv = self.speed
+        elif self.dir == Ant.LEFT:
+            mv = - self.speed
+        self.pos = np.add(self.pos, (mv, 0))
         self.state = Ant.WALKING
+        self.walking = True
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, name, iterable):
@@ -77,8 +106,6 @@ class Sprite(pygame.sprite.Sprite):
         self.images = []
         for i in iterable:
             self.images.append(load_image('sprite/{}/{}.png'.format(name, i)))
-        # assuming both images are 64x64 pixels
-
         self.index = 0
         self.image = self.images[self.index]
         size = self.image.get_rect().size
@@ -124,15 +151,16 @@ def main():
         elif pressed[pygame.K_LEFT]: ant.left()
         elif pressed[pygame.K_DOWN]: ant.down()
         elif pressed[pygame.K_UP]: ant.up()
+        elif pressed[pygame.K_SPACE]: ant.switch_mode_auto()
 
         ant.update(world_width=width)
 
         screen.fill((220, 220, 220))
         screen.blit(bg, (0, 0))
-        ant.draw(screen, (0, height-27-ant.height))
+        ant.draw(screen, (0, height-26-ant.height))
         screen.blit(fg, (0, 0))
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(5)
 
 if __name__ == '__main__':
     main()
