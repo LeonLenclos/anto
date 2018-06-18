@@ -132,7 +132,7 @@ def main():
         ant.draw(screen, (0, height-27-ant.height))
         screen.blit(fg, (0, 0))
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(8)
 
 if __name__ == '__main__':
     main()
