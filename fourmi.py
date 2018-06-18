@@ -129,8 +129,9 @@ class Sprite(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    size = width, height = 720, 480
-    screen = pygame.display.set_mode(size)
+    size = width, height = 720//2, 480//2
+    screen = pygame.surface.Surface(size)
+    window = pygame.display.set_mode((width*2, height*2))
     pygame.display.toggle_fullscreen()
     clock = pygame.time.Clock()
 
@@ -161,6 +162,7 @@ def main():
         screen.blit(bg, (0, 0))
         ant.draw(screen, (0, height-26-ant.height))
         screen.blit(fg, (0, 0))
+        window.blit(pygame.transform.scale(screen, (width*2, height*2)), (0,0))
         pygame.display.flip()
         clock.tick(fps)
 
