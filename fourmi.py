@@ -129,7 +129,7 @@ class Sprite(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    size = width, height = 480,320
+    size = width, height = 720, 480
     screen = pygame.display.set_mode(size)
     pygame.display.toggle_fullscreen()
     clock = pygame.time.Clock()
